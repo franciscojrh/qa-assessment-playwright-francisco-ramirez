@@ -41,7 +41,45 @@ For detailed step-by-step setup instructions, refer to the dedicated [Zero-Cost 
 
 ---
 
-## 3. Candidate Action Plan: What You Need To Do
+## 3. Candidate Action Plan & Architecture Transformation
+
+### Visual Deliverable Transformation: Starter Skeleton vs. Final Delivery
+
+The diagram below illustrates the exact transformation expected from the candidate: starting from the baseline repository skeleton to the production-ready test automation deliverable.
+
+```mermaid
+flowchart TD
+    subgraph StarterState ["1. Starter Repository (What You Receive)"]
+        A1["src/pages/base.page.ts (Abstract Class)"]
+        A2["src/fixtures/test.fixture.ts (Base Extension Point)"]
+        A3["tests/smoke/sample.spec.ts (Minimal Baseline)"]
+        A4["scripts/ai-triage.ts (Stub Interface)"]
+        A5["docs/specs/ & docs/adr/ (Markdown Templates)"]
+    end
+
+    subgraph AgenticProcess ["2. Agentic Workflow with MCP"]
+        B1["Live Web UI (Target Application)"] -->|Inspect DOM via MCP| B2["AI Coding Agent (Antigravity / Cursor / Claude)"]
+        B2 -->|Extract Semantic Accessibility Tree| B3["Page Object Scaffolding"]
+        B2 -->|Implement Spec-Driven Contracts| B4["Test Orchestration & Fixture Injection"]
+    end
+
+    subgraph FinalState ["3. Final Deliverable (What You Must Build)"]
+        C1["src/pages/*.page.ts (Typed POMs with Private Locators)"]
+        C2["src/fixtures/test.fixture.ts (Registered Fixtures & DI)"]
+        C3["tests/smoke/ & tests/regression/ (Full Spec Suites)"]
+        C4["docs/specs/*.md (Behavioral Contracts - Tier 2/3)"]
+        C5["src/mcp/*.json (Custom Tool Schemas - Tier 2/3)"]
+        C6["scripts/ai-triage.ts & src/utils/ (CI Triage - Tier 3)"]
+        C7["GitHub Pull Request (Green CI, Logs & PR Summary)"]
+    end
+
+    StarterState ==> AgenticProcess
+    AgenticProcess ==> FinalState
+```
+
+---
+
+### Step-by-Step Execution Lifecycle
 
 Follow this sequential action plan from initial assignment to final submission:
 
