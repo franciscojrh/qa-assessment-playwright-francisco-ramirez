@@ -2,6 +2,8 @@
 
 This guide walks you through provisioning your assessment repository, granting access to the evaluation team, configuring your local environment, and connecting your Model Context Protocol (MCP) server.
 
+For a 100% free setup ($0 budget) using Google Antigravity, Google AI Studio, and local open-source MCP tools, see [Zero-Cost Environment Setup Guide](FREE_SETUP_GUIDE.md).
+
 ---
 
 ## 1. Prerequisites

@@ -8,27 +8,35 @@ The assessment evaluates practical judgment, architectural discipline, robust au
 
 ---
 
-## 2. Recommended LLM Models & Agent Environments
+## 2. Zero-Cost Infrastructure & Recommended AI Models ($0 Budget Setup)
 
-To achieve accurate MCP tool-calling, DOM inspection, and compliant TypeScript code generation, specific frontier LLM models are strongly recommended.
+The entire assessment framework can be executed at **$0 total cost** by combining Google Antigravity, Google AI Studio free tier quotas, local open-source MCP servers, and GitHub Actions free minutes.
 
-### Recommended Models
+For detailed step-by-step setup instructions, refer to the dedicated [Zero-Cost Environment Setup Guide](docs/FREE_SETUP_GUIDE.md).
+
+### Zero-Cost Stack Summary
+
+| Component | Free Solution | Cost | Quota / Free Capacity |
+| :--- | :--- | :--- | :--- |
+| **Agentic IDE** | **Google Antigravity IDE** | $0 (Free) | Native MCP server discovery, agent orchestration, and sub-agent workflows. |
+| **Frontier LLM** | **Gemini 2.0 Flash / Pro** (via Google AI Studio) | $0 (Free Tier) | 15 RPM, 1,000,000 TPM, 1,500 free requests per day. |
+| **Local MCP Server** | `@executeautomation/playwright-mcp-server` | $0 (Open Source) | Local Chromium control via `npx`; zero cloud compute cost. |
+| **Browser Engine** | Playwright Chromium Binaries | $0 (Open Source) | High-speed local browser execution engine. |
+| **CI/CD Pipeline** | GitHub Actions | $0 (Free Tier) | 2,000 free runner minutes per month. |
+| **Offline LLM (Optional)** | Ollama (`qwen2.5-coder:14b` / `llama3.3`) | $0 (Open Source) | 100% offline local model execution without internet connection. |
+
+### LLM Model Recommendations
 
 | Model | Recommendation Level | Primary Strengths | Best Used For |
 |-------|----------------------|-------------------|---------------|
-| **Anthropic Claude 3.7 Sonnet / Claude 3.5 Sonnet** | **Highly Recommended (Primary)** | Industry-leading tool-calling accuracy, deep context reasoning, zero locator hallucination, strict adherence to negative system prompt constraints. | Live DOM inspection, Page Object scaffolding, complex dynamic test orchestration. |
+| **Anthropic Claude 3.7 Sonnet / Claude 3.5 Sonnet** | **Highly Recommended (Frontier)** | Industry-leading tool-calling accuracy, deep context reasoning, zero locator hallucination, strict adherence to negative system prompt constraints. | Live DOM inspection, Page Object scaffolding, complex dynamic test orchestration. |
+| **Google Gemini 2.0 Flash / Pro** | **Highly Recommended (Zero-Cost)** | Large context window handling (1M tokens), fast multi-turn debugging, strong multimodal reasoning for screenshot/trace triage, generous free tier. | Large test report analysis, trace diagnostics, token-efficient triage scripts. |
 | **OpenAI GPT-4o** | **Recommended** | High instruction-following fidelity, fast generation velocity, accurate schema definition. | Spec-Driven Development, fixture extension, data generation schemas. |
-| **Google Gemini 2.0 Flash / Pro** | **Recommended** | Large context window handling, fast multi-turn debugging, strong multimodal reasoning for screenshot/trace triage. | Large test report analysis, trace diagnostics, token-efficient triage scripts. |
-
-### Minimum Model Capabilities Required
-- **Reliable Function Calling / Tool Calling**: Capability to invoke MCP JSON-RPC tools with strictly typed arguments without syntax drops.
-- **TypeScript Strict Mode Awareness**: Zero generation of `any` types, unawaited Playwright promises, or deprecated methods.
-- **Constraint Adherence**: Ability to follow negative constraints (e.g., "NEVER write `page.locator()` in spec files").
 
 ### Supported AI Coding Environments
+- **Antigravity IDE** (Native MCP Tooling & Sub-agent Orchestration — Free)
 - **Cursor IDE** (Composer / Agent Mode with Playwright MCP)
 - **Claude Desktop** (Configured with local Playwright MCP Server)
-- **Antigravity IDE** (Native MCP Tooling & Sub-agent Orchestration)
 - **Windsurf IDE** (Cascade Agent with MCP integration)
 
 ---
@@ -230,6 +238,7 @@ Open the Pull Request against `main`, fill out the PR description template with 
 ├── RUBRIC.md                   # Full evaluation matrix with scoring criteria and weights
 ├── AGENTS.md                   # System rules, coding standards, POM conventions, and MCP constraints
 ├── docs/
+│   ├── FREE_SETUP_GUIDE.md     # Dedicated zero-cost setup guide ($0 budget)
 │   ├── GETTING_STARTED.md      # Environment setup, Playwright config, and MCP server connectivity
 │   ├── FACILITATOR_GUIDE.md    # Evaluator instructions, oral defense question bank, and scoring sheets
 │   ├── SAMPLE_CHALLENGES.md    # Pre-built practical challenge scenarios for each tier
@@ -273,7 +282,7 @@ Open the Pull Request against `main`, fill out the PR description template with 
    ```bash
    npx playwright install --with-deps chromium
    ```
-3. Configure your local MCP server following [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
+3. Configure your local MCP server following [docs/FREE_SETUP_GUIDE.md](docs/FREE_SETUP_GUIDE.md) or [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
 4. Run baseline healthcheck:
    ```bash
    npm run typecheck && npm run test:smoke
