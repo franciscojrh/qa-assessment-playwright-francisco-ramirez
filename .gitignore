@@ -1,0 +1,55 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Playwright Test Artifacts & Reports
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+allure-results/
+allure-report/
+
+# Environment Variables & Secrets
+.env
+.env.*
+!.env.example
+.auth/
+*.pem
+*.key
+
+# TypeScript & Compilation Outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Logs & Debug Output
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE & Editor Configurations
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+*.swp
+*.swo
+*~
+
+# Temporary & Cache Directories
+.temp/
+.tmp/
+tmp/

@@ -1,0 +1,30 @@
+{
+  "name": "qa-assessment-playwright-mcp",
+  "version": "1.0.0",
+  "description": "Standardized assessment repository for QA & SDET engineers evaluating Playwright and Model Context Protocol (MCP)",
+  "main": "index.js",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts",
+    "test": "playwright test",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:regression": "playwright test --grep @regression",
+    "test:debug": "playwright test --ui",
+    "test:report": "playwright show-report"
+  },
+  "keywords": [
+    "playwright",
+    "mcp",
+    "qa",
+    "sdet",
+    "assessment",
+    "agentic-testing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^20.17.0",
+    "typescript": "^5.6.3"
+  }
+}
