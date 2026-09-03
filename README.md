@@ -1,48 +1,82 @@
 # Playwright & Model Context Protocol (MCP) QA Assessment Framework
 
-## 1. Overview
+## 1. Overview & Purpose
 
-This repository is a standardized, universal assessment framework to evaluate Quality Assurance (QA) and Software Development Engineers in Test (SDET) on **Playwright** test automation and **Model Context Protocol (MCP)** agentic workflows.
+This repository provides a standardized, universal technical assessment framework designed to evaluate Quality Assurance (QA) engineers and Software Development Engineers in Test (SDET) on modern test automation using **Playwright** integrated with the **Model Context Protocol (MCP)** and AI coding agents.
 
-Candidates are assessed on practical judgment, architectural discipline, robust automation patterns, and effective human-AI collaboration. The goal is not manual code typing, but orchestrating AI coding agents, leveraging MCP tools for deterministic browser inspection, maintaining strict quality standards, and validating generated code for production readiness.
+The assessment evaluates practical judgment, architectural discipline, robust automation standards, and effective human-AI collaboration. Candidates are not evaluated on typing every line of code manually; rather, they are assessed on their ability to orchestrate AI agents, use MCP tools for deterministic browser inspection, enforce strict testing patterns, and validate AI-generated artifacts for production readiness.
 
 ---
 
-## 2. Universal Candidate Deliverables & Submission Protocol
+## 2. Recommended LLM Models & Agent Environments
 
-Every candidate must deliver a standardized, self-contained set of artifacts. The evaluation is conducted on a **new repository created by the candidate**, where access is granted to the evaluation team.
+To achieve accurate MCP tool-calling, DOM inspection, and compliant TypeScript code generation, specific frontier LLM models are strongly recommended.
+
+### Recommended Models
+
+| Model | Recommendation Level | Primary Strengths | Best Used For |
+|-------|----------------------|-------------------|---------------|
+| **Anthropic Claude 3.7 Sonnet / Claude 3.5 Sonnet** | **Highly Recommended (Primary)** | Industry-leading tool-calling accuracy, deep context reasoning, zero locator hallucination, strict adherence to negative system prompt constraints. | Live DOM inspection, Page Object scaffolding, complex dynamic test orchestration. |
+| **OpenAI GPT-4o** | **Recommended** | High instruction-following fidelity, fast generation velocity, accurate schema definition. | Spec-Driven Development, fixture extension, data generation schemas. |
+| **Google Gemini 2.0 Flash / Pro** | **Recommended** | Large context window handling, fast multi-turn debugging, strong multimodal reasoning for screenshot/trace triage. | Large test report analysis, trace diagnostics, token-efficient triage scripts. |
+
+### Minimum Model Capabilities Required
+- **Reliable Function Calling / Tool Calling**: Capability to invoke MCP JSON-RPC tools with strictly typed arguments without syntax drops.
+- **TypeScript Strict Mode Awareness**: Zero generation of `any` types, unawaited Playwright promises, or deprecated methods.
+- **Constraint Adherence**: Ability to follow negative constraints (e.g., "NEVER write `page.locator()` in spec files").
+
+### Supported AI Coding Environments
+- **Cursor IDE** (Composer / Agent Mode with Playwright MCP)
+- **Claude Desktop** (Configured with local Playwright MCP Server)
+- **Antigravity IDE** (Native MCP Tooling & Sub-agent Orchestration)
+- **Windsurf IDE** (Cascade Agent with MCP integration)
+
+---
+
+## 3. Candidate Action Plan: What You Need To Do
+
+Follow this sequential action plan from initial assignment to final submission:
 
 ```
 +---------------------------------------------------------------------------------------------------+
-|                                  CANDIDATE SUBMISSION WORKFLOW                                    |
+|                                  CANDIDATE STEP-BY-STEP ACTION PLAN                               |
 +---------------------------------------------------------------------------------------------------+
 |                                                                                                   |
-|   1. Create New Repository from Template                                                          |
-|      - Create a new repository on GitHub (private or public per cohort instructions).             |
-|      - Clone the repository locally and verify baseline dependencies.                             |
+|   PHASE 1: REPOSITORY SETUP & ACCESS PROVISIONING                                                 |
+|   1. Create a new private repository on your GitHub account (e.g. `qa-assessment-<your-name>`).   |
+|   2. Push this starter template to your new repository `main` branch.                             |
+|   3. Go to GitHub Settings > Collaborators > Add People. Invite the evaluation team handles.      |
+|   4. Create your submission branch: `git checkout -b submission/<your-name>`.                     |
 |                                                                                                   |
-|   2. Grant Access to Evaluation Team                                                              |
-|      - Navigate to GitHub Repository > Settings > Collaborators > Add People.                     |
-|      - Invite the designated evaluator GitHub handles / team emails before starting.              |
+|   PHASE 2: PRACTICAL CHALLENGE EXECUTION                                                          |
+|   1. Receive your assigned Tier (Tier 1, Tier 2, or Tier 3) and scenario from the brief.          |
+|   2. Direct your AI agent using the Playwright MCP server to inspect the live target application. |
+|   3. Scaffold typed Page Object Model (POM) classes in `src/pages/` (private locators only).      |
+|   4. Register Page Objects in `src/fixtures/test.fixture.ts` for fixture-driven injection.        |
+|   5. Author spec files in `tests/smoke/` or `tests/regression/` with web-first assertions.       |
+|   6. (Tier 2/3): Author spec contracts in `docs/specs/` or custom MCP schemas in `src/mcp/`.      |
+|   7. (Tier 3): Implement `scripts/ai-triage.ts`, `src/utils/security-sanitizer.ts`, and ADR.     |
 |                                                                                                   |
-|   3. Create Feature Branch                                                                        |
-|      - Create working branch: `git checkout -b submission/<candidate-name>`                       |
+|   PHASE 3: LOCAL VALIDATION & QUALITY GATES                                                       |
+|   1. Run `npm run typecheck` — must pass with 0 TypeScript compiler errors.                      |
+|   2. Run `npm run test:smoke` or `npm run test:regression` — all tests must execute 100% green.  |
+|   3. Confirm zero `page.waitForTimeout()` and zero direct locators in spec files.                 |
 |                                                                                                   |
-|   4. Complete Assigned Practical Challenge                                                        |
-|      - Implement POM classes, custom fixtures, spec files, and tier-specific artifacts.           |
-|                                                                                                   |
-|   5. Validate Quality Gates Locally                                                               |
-|      - Run `npm run typecheck && npm run test:smoke` (all checks must be 100% green).             |
-|                                                                                                   |
-|   6. Submit Pull Request & Share Links                                                            |
-|      - Open Pull Request from `submission/<candidate-name>` into `main`.                          |
-|      - Complete the standardized PR template with tool execution logs.                            |
-|      - Provide Repository URL and Pull Request URL to the evaluation committee.                   |
+|   PHASE 4: PULL REQUEST SUBMISSION & DEFENSE                                                      |
+|   1. Commit and push your branch to GitHub.                                                       |
+|   2. Open a Pull Request from `submission/<your-name>` into `main`.                              |
+|   3. Fill out the Pull Request Description Template (MCP tool log, prompts, test evidence).       |
+|   4. Submit your Repository URL and PR Link to the evaluation committee.                         |
+|   5. Participate in the 20-30 minute technical defense walkthrough with evaluators.               |
 |                                                                                                   |
 +---------------------------------------------------------------------------------------------------+
 ```
 
-### Universal Deliverables Matrix
+---
+
+## 4. Universal Candidate Deliverables Matrix
+
+Every candidate must deliver the following standardized artifacts corresponding to their assigned tier:
 
 | Artifact | Location | Description | Applicable Tiers |
 |----------|----------|-------------|------------------|
@@ -58,24 +92,23 @@ Every candidate must deliver a standardized, self-contained set of artifacts. Th
 
 ---
 
-## 3. Assessment Tiers & Timeboxes
+## 5. Assessment Tiers & Scoring Benchmarks
 
-| Tier | Level | Target Timebox | Core Scope | Minimum Score Threshold |
-|------|-------|----------------|------------|-------------------------|
+| Tier | Level | Target Timebox | Core Scope | Minimum Passing Score |
+|------|-------|----------------|------------|-----------------------|
 | **Tier 1** | Foundational | 60 - 90 minutes | MCP DOM inspection, Page Object generation, custom fixtures, token efficiency, smoke validation. | 80% (36 / 45 pts) |
 | **Tier 2** | Advanced | 2 - 4 hours | Spec-Driven Development, custom MCP tool schema / sub-agents, dynamic state handling, API mocking. | 85% (72 / 85 pts) |
 | **Tier 3** | Master / Certification | 4 - 6 hours (Half Day) | Enterprise CI/CD pipeline, AI failure triage & trace analyzer, DOM security sanitization, ADR. | 90% (95 / 105 pts) |
 
-Facilitator scoring criteria are defined in [RUBRIC.md](RUBRIC.md).
+Detailed scoring criteria, behavioral indicators, and anti-patterns are documented in [RUBRIC.md](RUBRIC.md).
 
 ---
 
-## 4. Step-by-Step Deliverable Walkthrough (Illustrative Reference)
+## 6. Step-by-Step Deliverable Walkthrough (Illustrative Reference)
 
-The following walkthrough illustrates how any candidate completes an assessment scenario using an AI agent with MCP integration:
+The following walkthrough demonstrates how to complete an assessment scenario using an AI agent with MCP integration:
 
-### Step 1: Receiving Scenario & Branch Creation
-Create your feature branch:
+### Step 1: Branch Creation
 ```bash
 git checkout -b submission/jane-doe-assessment
 ```
@@ -83,7 +116,7 @@ git checkout -b submission/jane-doe-assessment
 ### Step 2: Live DOM Inspection via MCP
 Direct your AI coding assistant to use the configured Playwright MCP server to inspect the target application:
 
-**Example Agent Prompt**:
+**Example Prompt**:
 ```text
 Navigate to the target portal using the Playwright MCP server. Inspect the login form and header navigation bar. Extract the semantic accessibility roles (roles, labels, placeholders) for the username input, password input, submit button, and settings menu link.
 ```
@@ -189,7 +222,7 @@ Open the Pull Request against `main`, fill out the PR description template with 
 
 ---
 
-## 5. Repository Structure
+## 7. Repository Structure
 
 ```text
 .
@@ -230,7 +263,7 @@ Open the Pull Request against `main`, fill out the PR description template with 
 
 ---
 
-## 6. Quick Start
+## 8. Quick Start
 
 1. Install dependencies:
    ```bash
@@ -248,7 +281,7 @@ Open the Pull Request against `main`, fill out the PR description template with 
 
 ---
 
-## 7. Non-Negotiable Engineering Rules
+## 9. Non-Negotiable Engineering Rules
 
 - **Zero Direct Locators in Specs**: `page.locator()` or `page.$()` inside `tests/**/*.spec.ts` is strictly prohibited. All locators must be private in POM classes.
 - **Dependency Injection**: Never instantiate Page Objects with `new MyPage(page)` inside spec files. Consume from `@fixtures`.
