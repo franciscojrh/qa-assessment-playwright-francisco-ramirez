@@ -41,11 +41,45 @@ For detailed step-by-step setup instructions, refer to the dedicated [Zero-Cost 
 
 ---
 
-## 3. Candidate Action Plan & Architecture Transformation
+## 3. End-to-End Candidate Journey: From Start to Finish
+
+This journey outlines the exact path every candidate follows from the moment the assessment starts to the final technical defense, defining what is expected at each milestone without providing pre-solved code.
+
+### Visual Journey & Milestone Flow
+
+```mermaid
+journey
+    title Candidate Assessment Journey
+    section 1. Provisioning
+      Create new GitHub repo: 5: Candidate
+      Push starter template to main: 5: Candidate
+      Invite evaluator team: 5: Candidate
+      Create branch submission/name: 5: Candidate
+    section 2. MCP Exploration
+      Connect agent to Playwright MCP: 5: Candidate, Agent
+      Inspect live target UI DOM: 5: Candidate, Agent
+      Extract accessibility tree: 5: Candidate, Agent
+    section 3. Architecture & POM
+      Scaffold Page Object classes: 5: Candidate, Agent
+      Encapsulate private locators: 5: Candidate
+      Register custom fixtures: 5: Candidate
+    section 4. Test Authoring
+      Write test specs with web-first asserts: 5: Candidate, Agent
+      Add metadata tags (@smoke, @regression): 5: Candidate
+      Implement Tier 2/3 artifacts (Specs/Triage): 4: Candidate
+    section 5. Quality Gate
+      Run npm run typecheck: 5: Candidate
+      Run npm test (100% green): 5: Candidate
+      Audit for zero forbidden anti-patterns: 5: Candidate
+    section 6. Delivery & Defense
+      Open Pull Request with template: 5: Candidate
+      Verify GitHub Actions CI pass: 5: Candidate
+      Conduct technical defense walkthrough: 5: Candidate, Evaluator
+```
+
+---
 
 ### Visual Deliverable Transformation: Starter Skeleton vs. Final Delivery
-
-The diagram below illustrates the exact transformation expected from the candidate: starting from the baseline repository skeleton to the production-ready test automation deliverable.
 
 ```mermaid
 flowchart TD
@@ -79,44 +113,73 @@ flowchart TD
 
 ---
 
-### Step-by-Step Execution Lifecycle
+### Detailed Stage-by-Stage Journey Breakdown
 
-Follow this sequential action plan from initial assignment to final submission:
+#### Stage 1: Kickoff & Environment Provisioning (Minutes 0 - 15)
+- **Goal**: Establish a clean working repository and grant evaluator access.
+- **Actions Required**:
+  1. Create a new private repository on your GitHub account (e.g., `qa-assessment-playwright-<your-name>`).
+  2. Push the base starter template to your `main` branch.
+  3. Go to **Settings > Collaborators > Add People** and invite the evaluation team handles.
+  4. Create your submission branch: `git checkout -b submission/<your-name>`.
+  5. Run `npm install` and verify the baseline passes with `npm run typecheck && npm run test:smoke`.
+- **Exit Criteria**: Baseline test passes locally, evaluators have repository access, and your feature branch is active.
 
-```
-+---------------------------------------------------------------------------------------------------+
-|                                  CANDIDATE STEP-BY-STEP ACTION PLAN                               |
-+---------------------------------------------------------------------------------------------------+
-|                                                                                                   |
-|   PHASE 1: REPOSITORY SETUP & ACCESS PROVISIONING                                                 |
-|   1. Create a new private repository on your GitHub account (e.g. `qa-assessment-<your-name>`).   |
-|   2. Push this starter template to your new repository `main` branch.                             |
-|   3. Go to GitHub Settings > Collaborators > Add People. Invite the evaluation team handles.      |
-|   4. Create your submission branch: `git checkout -b submission/<your-name>`.                     |
-|                                                                                                   |
-|   PHASE 2: PRACTICAL CHALLENGE EXECUTION                                                          |
-|   1. Receive your assigned Tier (Tier 1, Tier 2, or Tier 3) and scenario from the brief.          |
-|   2. Direct your AI agent using the Playwright MCP server to inspect the live target application. |
-|   3. Scaffold typed Page Object Model (POM) classes in `src/pages/` (private locators only).      |
-|   4. Register Page Objects in `src/fixtures/test.fixture.ts` for fixture-driven injection.        |
-|   5. Author spec files in `tests/smoke/` or `tests/regression/` with web-first assertions.       |
-|   6. (Tier 2/3): Author spec contracts in `docs/specs/` or custom MCP schemas in `src/mcp/`.      |
-|   7. (Tier 3): Implement `scripts/ai-triage.ts`, `src/utils/security-sanitizer.ts`, and ADR.     |
-|                                                                                                   |
-|   PHASE 3: LOCAL VALIDATION & QUALITY GATES                                                       |
-|   1. Run `npm run typecheck` — must pass with 0 TypeScript compiler errors.                      |
-|   2. Run `npm run test:smoke` or `npm run test:regression` — all tests must execute 100% green.  |
-|   3. Confirm zero `page.waitForTimeout()` and zero direct locators in spec files.                 |
-|                                                                                                   |
-|   PHASE 4: PULL REQUEST SUBMISSION & DEFENSE                                                      |
-|   1. Commit and push your branch to GitHub.                                                       |
-|   2. Open a Pull Request from `submission/<your-name>` into `main`.                              |
-|   3. Fill out the Pull Request Description Template (MCP tool log, prompts, test evidence).       |
-|   4. Submit your Repository URL and PR Link to the evaluation committee.                         |
-|   5. Participate in the 20-30 minute technical defense walkthrough with evaluators.               |
-|                                                                                                   |
-+---------------------------------------------------------------------------------------------------+
-```
+#### Stage 2: Exploration & Live UI Inspection via MCP (Minutes 15 - 30)
+- **Goal**: Direct your AI agent to inspect the target application live using the Model Context Protocol.
+- **Actions Required**:
+  1. Receive your assigned Tier and target scenario from the brief (or facilitator).
+  2. Prompt your AI agent (Antigravity, Cursor, or Claude) to connect to the local Playwright MCP server.
+  3. Instruct the agent to navigate to the target application URL and inspect the relevant UI component subtrees.
+  4. Instruct the agent to extract the semantic accessibility tree (roles, accessible names, placeholders).
+- **Expectations & Good Judgment**:
+  - Do not guess locators manually or accept brittle CSS/XPath selectors from the agent.
+  - Ensure the agent relies on semantic accessibility roles (`getByRole`, `getByLabel`, `getByPlaceholder`, `getByTestId`).
+- **Exit Criteria**: Verified set of unique, robust accessibility locators identified via live MCP inspection.
+
+#### Stage 3: Architectural Construction (POM & Custom Fixtures) (Minutes 30 - 60)
+- **Goal**: Scaffold maintainable Page Object Models and wire them into Playwright fixtures.
+- **Actions Required**:
+  1. Direct your agent to create typed Page Object classes in `src/pages/*.page.ts` extending `BasePage`.
+  2. Ensure all locators are private read-only properties inside the POM class.
+  3. Define public user action methods that represent high-level user workflows and return typed Promises.
+  4. Register all Page Objects in `src/fixtures/test.fixture.ts` using `test.extend<CustomFixtures>()`.
+  5. *(Tier 2/3)*: Author behavioral feature contract specifications in `docs/specs/` and custom MCP tool schemas in `src/mcp/`.
+- **Expectations & Good Judgment**:
+  - Never allow direct locator definitions inside test spec files.
+  - Never instantiate Page Objects with `new MyPage(page)` inside specs; always inject via custom fixtures.
+- **Exit Criteria**: Page Objects and fixtures compile with 0 TypeScript compiler errors.
+
+#### Stage 4: Test Suite Implementation & Web-First Assertions (Minutes 60 - 90+)
+- **Goal**: Author deterministic, auto-waiting test suites.
+- **Actions Required**:
+  1. Create test spec files in `tests/smoke/` (for `@smoke`) and/or `tests/regression/` (for `@regression`).
+  2. Import `test` and `expect` exclusively from `@fixtures` (or `../../src/fixtures/test.fixture`).
+  3. Consume injected Page Objects from fixture arguments.
+  4. Write asynchronous, auto-waiting assertions (`await expect(locator).toBeVisible()`, `await expect(locator).toHaveText()`).
+  5. *(Tier 3)*: Implement `scripts/ai-triage.ts`, `src/utils/security-sanitizer.ts`, and `docs/adr/ADR-TEMPLATE.md`.
+- **Expectations & Good Judgment**:
+  - `page.waitForTimeout()` is strictly forbidden across all files.
+  - Validate that every Playwright API call is real, valid, and properly awaited.
+- **Exit Criteria**: Test suite covers all scenarios specified in the brief.
+
+#### Stage 5: Local Validation & Quality Assurance Gate
+- **Goal**: Guarantee zero defects and adherence to engineering rules before pushing.
+- **Actions Required**:
+  1. Run `npm run typecheck` — must exit with 0 errors.
+  2. Run `npm test` (or `npm run test:smoke` / `npm run test:regression`) — all tests must pass 100% green across consecutive runs.
+  3. Perform a self-audit against the Pre-Commit Checklist in `AGENTS.md`.
+- **Exit Criteria**: 100% green test execution and clean static analysis locally.
+
+#### Stage 6: Pull Request Submission & Technical Defense
+- **Goal**: Deliver a transparent engineering package and defend technical choices.
+- **Actions Required**:
+  1. Commit your changes and push the branch: `git push -u origin submission/<your-name>`.
+  2. Open a Pull Request from `submission/<your-name>` into `main`.
+  3. Complete the standardized Pull Request Description Template (Summary, MCP Tool Invocations, Prompts Used, AI Corrections Made, Test Evidence).
+  4. Share the Repository URL and Pull Request Link with the evaluation committee.
+  5. Attend the 20-30 minute technical defense walkthrough with evaluators (walk through architecture, explain prompt iterations, and resolve a live simulated UI failure).
+- **Exit Criteria**: Pull Request submitted, CI pipeline green, and technical defense completed.
 
 ---
 
@@ -145,8 +208,6 @@ Every candidate must deliver the following standardized artifacts corresponding 
 | **Tier 1** | Foundational | 60 - 90 minutes | MCP DOM inspection, Page Object generation, custom fixtures, token efficiency, smoke validation. | 80% (36 / 45 pts) |
 | **Tier 2** | Advanced | 2 - 4 hours | Spec-Driven Development, custom MCP tool schema / sub-agents, dynamic state handling, API mocking. | 85% (72 / 85 pts) |
 | **Tier 3** | Master / Certification | 4 - 6 hours (Half Day) | Enterprise CI/CD pipeline, AI failure triage & trace analyzer, DOM security sanitization, ADR. | 90% (95 / 105 pts) |
-
-Detailed scoring criteria, behavioral indicators, and anti-patterns are documented in [RUBRIC.md](RUBRIC.md).
 
 ---
 
@@ -273,7 +334,6 @@ Open the Pull Request against `main`, fill out the PR description template with 
 ```text
 .
 ├── ASSESSMENT_BRIEF.md         # Comprehensive candidate instructions and tier challenges
-├── RUBRIC.md                   # Full evaluation matrix with scoring criteria and weights
 ├── AGENTS.md                   # System rules, coding standards, POM conventions, and MCP constraints
 ├── docs/
 │   ├── FREE_SETUP_GUIDE.md     # Dedicated zero-cost setup guide ($0 budget)
