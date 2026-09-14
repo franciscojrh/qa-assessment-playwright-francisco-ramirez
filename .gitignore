@@ -16,6 +16,9 @@ allure-report/
 .env.*
 !.env.example
 .auth/
+mcp-setup.local.json
+.cursor/mcp.json
+.cursor/hooks/*.log
 *.pem
 *.key
 

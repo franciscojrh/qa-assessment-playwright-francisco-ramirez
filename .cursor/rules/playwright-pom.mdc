@@ -1,0 +1,29 @@
+---
+description: Enforce Playwright POM standards (Cursor). Canonical source is AGENTS.md.
+globs: tests/**/*.ts, src/**/*.ts, playwright.config.ts, global-setup.ts
+---
+
+# Playwright — Cursor enforcement
+
+**Canonical runbook:** `AGENTS.md` — read it before editing or generating Playwright files.
+
+**Cursor workflows:** `.cursor/workflows/*.md`
+
+## Enforce (summary — full detail in AGENTS.md)
+
+- Import `test` / `expect` from `@fixtures` (`src/fixtures/test.fixture.ts`), not `@playwright/test`.
+- Register Page Objects in `test.fixture.ts`. Specs must never use `new PageObject(page)`.
+- Selectors: accessibility-first (`getByRole`, `getByLabel`, then `getByTestId` / `data-qa`). No raw CSS/XPath.
+- POMs extend `BasePage` in `src/pages/base.page.ts`; no locators in spec files.
+- Tags: `@smoke` or `@regression` in every test title; CI gate is smoke only.
+- WIP tests: `test.skip()` with reason — never commit failing regression.
+- Credentials from env via `TEST_CREDENTIALS` / `API_CONFIG`; never hardcode secrets.
+
+## After generating or changing tests
+
+1. Run `npm run typecheck && npm run test:smoke` when feasible.
+2. On failure: use test-analyzer MCP on `test-results/report.json`.
+
+## Do not duplicate standards here
+
+If AGENTS.md and this rule conflict, **AGENTS.md wins**.

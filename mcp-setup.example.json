@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "test-analyzer": {
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/mcp-servers/test-analyzer/index.mjs"
+      ],
+      "env": {
+        "PLAYWRIGHT_JSON_REPORT": "${workspaceFolder}/test-results/report.json"
+      }
+    }
+  }
+}

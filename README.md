@@ -6,6 +6,8 @@ This repository provides a standardized, universal technical assessment framewor
 
 The assessment evaluates practical judgment, architectural discipline, robust automation standards, and effective human-AI collaboration. Candidates are not evaluated on typing every line of code manually; rather, they are assessed on their ability to orchestrate AI agents, use MCP tools for deterministic browser inspection, enforce strict testing patterns, and validate AI-generated artifacts for production readiness.
 
+This repository is **one clone**: the assessment brief and rubric sit on top of a working Playwright starter (POM, fixtures, optional API client, Cursor/Claude tooling). After `npm ci` and `npm run test:smoke`, follow [ASSESSMENT_BRIEF.md](ASSESSMENT_BRIEF.md). Canonical engineering rules: [AGENTS.md](AGENTS.md). Setup: [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md).
+
 ---
 
 ## 2. Zero-Cost Infrastructure & Recommended AI Models ($0 Budget Setup)

@@ -14,18 +14,23 @@
     "paths": {
       "@fixtures": ["src/fixtures/test.fixture.ts"],
       "@pages/*": ["src/pages/*"],
-      "@utils/*": ["src/utils/*"]
+      "@utils/*": ["src/utils/*"],
+      "@api": ["src/api/index.ts"],
+      "@api/*": ["src/api/*"],
+      "@data/*": ["src/data/*"]
     }
   },
   "include": [
     "src/**/*.ts",
     "tests/**/*.ts",
     "scripts/**/*.ts",
-    "playwright.config.ts"
+    "playwright.config.ts",
+    "global-setup.ts"
   ],
   "exclude": [
     "node_modules",
     "playwright-report",
-    "test-results"
+    "test-results",
+    "mcp-servers"
   ]
 }

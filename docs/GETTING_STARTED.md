@@ -51,8 +51,10 @@ git checkout -b submission/<your-name>
    npm install
    ```
 
-2. Install Playwright browser binaries:
+2. Copy local env (gitignored) and install Playwright browsers:
    ```bash
+   cp .env.example .env.dev
+   npm run setup
    npx playwright install --with-deps chromium
    ```
 
@@ -62,11 +64,15 @@ git checkout -b submission/<your-name>
    npm run test:smoke
    ```
 
+The starter already includes a working `@smoke` suite against `https://playwright.dev`, Page Objects in `src/pages/`, and fixture registration in `src/fixtures/test.fixture.ts`. After this check, open [ASSESSMENT_BRIEF.md](../ASSESSMENT_BRIEF.md) and complete your assigned tier.
+
 ---
 
 ## 4. Configuring the Model Context Protocol (MCP) Server
 
 To enable your AI agent to inspect live web pages, navigate the DOM, and capture accessibility snapshots, configure a Playwright MCP server.
+
+GitHub, Qase, Atlassian, and any other org MCP (Linear, Azure DevOps, TestRail, etc.) are **optional**. Foundations does not require them. See [`AGENTS.md`](../AGENTS.md) §11.
 
 ### Option A: Configuration for Cursor (`.cursor/mcp.json` or Global Settings)
 
@@ -149,12 +155,15 @@ To confirm that your AI agent is properly integrated with the MCP server:
 | Command | Purpose |
 |---------|---------|
 | `npm run typecheck` | Validates strict TypeScript compilation across all files |
-| `npm run lint` | Checks codebase against ESLint standards |
-| `npm run test` | Executes all Playwright tests across configured browsers |
+| `npm run test` | Executes all Playwright tests on Chromium |
 | `npm run test:smoke` | Runs tests tagged with `@smoke` |
 | `npm run test:regression` | Runs tests tagged with `@regression` |
-| `npm run test:debug` | Opens the Playwright interactive UI inspector |
+| `npm run test:api` | Runs API specs under `tests/api` (`@regression`) |
+| `npm run test:debug` / `npm run test:ui` | Opens the Playwright interactive UI inspector |
 | `npm run test:report` | Serves the generated Playwright HTML test report |
+| `npm run setup` | Installs Playwright browser binaries |
+
+Optional Cursor workflows live in `.cursor/workflows/`. Optional test-report MCP: `mcp-servers/test-analyzer/` (see `AGENTS.md` §11).
 
 ---
 

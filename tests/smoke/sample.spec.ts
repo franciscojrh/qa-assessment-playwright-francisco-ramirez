@@ -1,14 +1,19 @@
-import { test, expect } from '../../src/fixtures/test.fixture';
+import { test } from '@fixtures';
 
 /**
- * Smoke Test Suite Skeleton
- *
- * Candidates:
- * Author your smoke test scenarios here. Ensure all tests import test and expect
- * from the custom fixture and consume injected Page Objects.
+ * Baseline smoke against playwright.dev.
+ * Candidates: extend this suite and register additional Page Objects in
+ * `src/fixtures/test.fixture.ts`. Specs must consume injected fixtures only.
  */
-test.describe('Smoke Test Suite Structure @smoke @foundational', () => {
-  test('template smoke scenario structure', async ({ page }) => {
-    expect(page).toBeDefined();
+test.describe('Playwright.dev home @smoke @foundational', () => {
+  test('home page loads', async ({ examplePage }) => {
+    await examplePage.openHome();
+    await examplePage.assertHomeVisible();
+  });
+
+  test('get started navigates to docs', async ({ examplePage }) => {
+    await examplePage.openHome();
+    await examplePage.goToGetStarted();
+    await examplePage.assertOnDocs();
   });
 });

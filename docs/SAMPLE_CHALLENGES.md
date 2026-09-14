@@ -72,18 +72,48 @@ This document contains pre-defined practical challenge scenarios that facilitato
 
 ---
 
+### Challenge 2.3: Real Task App — Test Inventory & Seed Adoption (Todoist-class)
+- **Target URL**: Facilitator **must** provide a sandbox `BASE_URL` (staging / disposable task-manager environment) and, if login is required, disposable credentials. Do not assign this challenge without that sandbox.  
+  Do **not** use personal or production Todoist. Do **not** use `https://demo.playwright.dev/todomvc` (Challenge 1.2).
+- **Objective**: Use MCP to learn an unfamiliar product, **generate a prioritized test inventory**, then implement a small green suite on this seed — not a full product regression.
+- **Scenario**:
+  1. Point the seed at the app: copy `.env.example` → `.env.dev`, set `BASE_URL` (and `E2E_USER` / `E2E_PASSWORD` only if the facilitator issued a sandbox login). Never commit secrets.
+  2. Inspect the live UI with Playwright MCP (accessibility tree, unique roles/labels). Identify 1–2 primary views (e.g. inbox / today, task editor).
+  3. Author a test inventory in `docs/specs/task-app-coverage.md`:
+     - List **8–12** candidate cases covering create, complete, edit, filter/search, and one negative or empty state.
+     - Tag each as `@smoke`, `@regression`, or **out of scope** (with a one-line reason: auth wall, billing, third-party widget, etc.).
+     - Call out what you will **not** automate in this timebox.
+  4. Implement **only** the `@smoke` slice (2–3 tests, max 4):
+     - Page Objects in `src/pages/` extending `BasePage` (`src/pages/base.page.ts`).
+     - Register every POM in `src/fixtures/test.fixture.ts` (no `new PageObject(page)` in specs).
+     - Specs under `tests/smoke/` import `test` / `expect` from `@fixtures`.
+  5. If login is required, keep credentials in env; use `{ appPage }` / a dedicated login POM. Do not hardcode passwords. Skip billing, sharing, and integrations.
+- **Key Deliverables**:
+  - `docs/specs/task-app-coverage.md` (inventory + smoke vs regression vs out-of-scope)
+  - `src/pages/` task-app POMs (e.g. `inbox.page.ts`, `task-editor.page.ts`)
+  - `src/fixtures/test.fixture.ts` (registered fixtures)
+  - `tests/smoke/task-app.spec.ts` (tagged `@smoke @advanced`)
+  - PR note: MCP tools used, prompts, and any AI output you rejected
+- **Acceptance (facilitator)**:
+  - Inventory shows coverage thinking, not a dump of 40 cases
+  - Smoke is green: `npm run typecheck` && `npm run test:smoke`
+  - Zero locators and zero `new PageObject` in specs
+  - Zero secrets in git
+
+---
+
 ## Tier 3: Master Challenges (4 - 6 Hours / Half Day)
 
 ### Challenge 3.1: Enterprise CI/CD Pipeline with AI Failure Triage & DOM Security Sanitizer
 - **Target URL**: Full application suite (Playwright Docs + TodoMVC + API mock endpoints)
 - **Objective**: Build a complete, enterprise-grade test automation architecture featuring GitHub Actions CI/CD, automated AI trace failure diagnostics, and DOM security sanitization.
 - **Scenario**:
-  1. **CI/CD Integration**: Create `.github/workflows/test-automation.yml` running Playwright tests across multiple browsers in parallel. Configure failure artifact retention (HTML report, trace files, video recordings).
+  1. **CI/CD Integration**: Extend the existing `.github/workflows/test-automation.yml` (typecheck + smoke + artifacts). Add multi-browser execution if the brief requires it, richer failure artifacts (HTML report, traces, video), and wire AI triage into CI.
   2. **Automated AI Test Failure Triage Engine**: Author `scripts/ai-triage.ts`. When a test fails in CI, the script parses the failed test metadata, reads error stacks, analyzes DOM snapshots, invokes an LLM to categorize the failure (`[BUG]`, `[FLAKE]`, `[LOCATOR_MISMATCH]`, `[ENV_ERROR]`), and outputs a markdown summary to GitHub Job Summary.
   3. **Security & Data Sanitizer**: Implement `src/utils/security-sanitizer.ts` with unit tests (`tests/unit/sanitizer.spec.ts`). The module scrubs sensitive data (credit cards, PII, email addresses, Bearer tokens) from DOM snapshots and network logs before passing context to AI models.
   4. **Architecture Decision Record**: Author `docs/adr/ADR-001-agentic-test-architecture.md` outlining system topology, token cost projection, reliability SLOs, and security compliance.
 - **Key Deliverables**:
-  - `.github/workflows/test-automation.yml`
+  - Updated `.github/workflows/test-automation.yml`
   - `scripts/ai-triage.ts`
   - `src/utils/security-sanitizer.ts` & `tests/unit/sanitizer.spec.ts`
   - `docs/adr/ADR-001-agentic-test-architecture.md`

@@ -103,7 +103,7 @@ Each competency is scored on a scale from 1 to 5:
 
 #### B.2 Implements RAG (Retrieval-Augmented Generation) pipelines
 - **Tier 2**: Implements retrieval mechanisms that feed local repository guidelines (`AGENTS.md`, design system specs, OpenAPI schemas) into the agent's context during test generation.
-- **Tier 3**: Builds an automated RAG pipeline indexing the entire test suite, Playwright documentation, company UI component library, and Jira tickets to auto-generate regression tests.
+- **Tier 3**: Builds an automated RAG pipeline indexing the entire test suite, Playwright documentation, company UI component library, and Jira tickets (or equivalent tracker) to auto-generate regression tests.
 - *Anti-patterns*: Relying on the base model's stale training data instead of retrieving live project context.
 
 #### B.3 Works with embeddings and vector databases
@@ -154,7 +154,7 @@ Each competency is scored on a scale from 1 to 5:
 
 #### C.4 Practices Spec-Driven Development
 - **Tier 2**: Writes unambiguous behavioral specifications, acceptance criteria, or typed test contracts before generating automation code. Uses the spec as the ground-truth benchmark for AI generation.
-- **Tier 3**: Establishes organizational Spec-Driven AI pipelines where product requirements in Jira/markdown are automatically translated into validated Playwright test suites through deterministic verification gates.
+- **Tier 3**: Establishes organizational Spec-Driven AI pipelines where product requirements in Jira/markdown (or an equivalent tracker) are automatically translated into validated Playwright test suites through deterministic verification gates.
 - *Anti-patterns*: Asking the AI to "figure out what to test" without specifying expected business logic or acceptance criteria.
 
 #### C.5 Tests and validates AI-generated code

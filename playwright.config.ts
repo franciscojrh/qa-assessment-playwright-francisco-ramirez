@@ -1,27 +1,61 @@
 import { defineConfig, devices } from '@playwright/test';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
+
+/**
+ * Multi-environment loading.
+ * Expects NODE_ENV to be 'dev' or 'staging'. Defaults to 'dev'.
+ */
+const isCI = !!process.env.CI;
+const environment = process.env.NODE_ENV || 'dev';
+dotenv.config({ path: path.resolve(__dirname, `.env.${environment}`), quiet: true });
+dotenv.config({ path: path.resolve(__dirname, '.env.example'), quiet: true });
+
+const reporters: NonNullable<Parameters<typeof defineConfig>[0]['reporter']> = isCI
+  ? [
+      ['html', { open: 'never' }],
+      ['list'],
+      ['json', { outputFile: 'test-results/report.json' }],
+    ]
+  : [
+      ['list'],
+      ['html', { open: 'never' }],
+      ['json', { outputFile: 'test-results/report.json' }],
+    ];
 
 export default defineConfig({
   testDir: './tests',
+  globalSetup: require.resolve('./global-setup'),
   fullyParallel: true,
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 2 : undefined,
-  reporter: [
-    ['html', { open: 'never' }],
-    ['list']
-  ],
+  forbidOnly: isCI,
+  retries: isCI ? 2 : 0,
+  workers: isCI ? 2 : undefined,
+  timeout: 30_000,
+  expect: { timeout: 5_000 },
+  reporter: reporters,
   use: {
-    baseURL: 'https://playwright.dev',
+    baseURL: process.env.BASE_URL || 'https://playwright.dev',
+    testIdAttribute: 'data-qa',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
-    actionTimeout: 10000,
-    navigationTimeout: 15000,
+    actionTimeout: 10_000,
+    navigationTimeout: 15_000,
   },
   projects: [
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'smoke',
+      use: { ...devices['Desktop Chrome'] },
+      grep: /@smoke/,
+    },
+    {
+      name: 'regression',
+      use: { ...devices['Desktop Chrome'] },
+      grep: /@regression/,
     },
   ],
 });

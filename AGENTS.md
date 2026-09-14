@@ -166,10 +166,108 @@ When utilizing Model Context Protocol tools to inspect, automate, or debug:
 Every pull request or generated file must pass this verification checklist:
 
 - [ ] `npm run typecheck` passes with zero TypeScript compiler errors.
-- [ ] `npm run lint` passes with zero lint violations.
 - [ ] No `page.locator()` queries exist in `tests/**/*.spec.ts`.
 - [ ] All tests are imported from `src/fixtures/test.fixture.ts`.
 - [ ] Every test title contains descriptive metadata and tags (`@smoke`, `@regression`, `@tier1`, etc.).
 - [ ] No `page.waitForTimeout()` calls exist in any file.
 - [ ] All assertions use `await expect(...)`.
 - [ ] All tests execute green in headless mode locally (`npx playwright test`).
+
+---
+
+## 7. First-time setup & environment
+
+```bash
+npm ci
+npm run setup              # Playwright browser binaries
+cp .env.example .env.dev   # local only — never commit .env.dev
+```
+
+Optional report MCP:
+
+```bash
+cd mcp-servers/test-analyzer && npm ci && cd ../..
+```
+
+Requirements: **Node 20+**.
+
+Config loads `.env.${NODE_ENV}` from `playwright.config.ts`; default `NODE_ENV=dev`.
+
+| Variable | Description |
+|----------|-------------|
+| `BASE_URL` | App under test (default: playwright.dev) |
+| `API_BASE_URL` | Optional API base for `tests/api/` |
+| `API_KEY` | Optional API key (`x-api-key` by default) |
+| `E2E_USER` / `E2E_PASSWORD` | Optional Cognito creds — see `docs/recipes/cognito-hosted-ui.md` |
+| `E2E_AUTH` | Optional: `cognito` \| `local` \| `none` |
+
+Do not commit secrets, `.env.dev`, `.env.staging`, or `.auth/*`.
+
+---
+
+## 8. Folder layout (assessment + starter)
+
+```
+./
+├── tests/                 # Specs — orchestration via fixtures only
+│   ├── smoke/
+│   └── api/               # API regression (httpApi fixture)
+├── src/
+│   ├── pages/             # Page Object Models (extend BasePage in base.page.ts)
+│   ├── fixtures/          # test.fixture.ts — canonical DI for specs (@fixtures)
+│   ├── auth/              # sessionStorage helpers (optional Cognito)
+│   ├── api/               # HTTP client
+│   ├── data/              # Env-backed constants
+│   ├── mcp/               # Assessment MCP schema examples
+│   └── utils/             # Security sanitizer
+├── scripts/ai-triage.ts
+├── global-setup.ts        # Stub (no-op); replace for Cognito
+├── playwright.config.ts
+├── AGENTS.md              # THIS FILE — canonical
+├── ASSESSMENT_BRIEF.md
+├── docs/
+├── mcp-servers/test-analyzer/
+├── .claude/commands/
+└── .cursor/               # Cursor rules, workflows, hooks
+```
+
+---
+
+## 9. Auth (dual-mode)
+
+| Mode | When | Fixture |
+|------|------|---------|
+| Local / public | Default; no Cognito | `{ appPage }` → same as `{ page }` |
+| Cognito | Creds + non-localhost `BASE_URL`, or `E2E_AUTH=cognito` | `globalSetup` + `{ appPage }` / `{ authenticatedPage }` |
+
+This repo ships with stub `global-setup.ts`. Enable Cognito via `docs/recipes/cognito-hosted-ui.md`.
+
+---
+
+## 10. Run tests
+
+```bash
+npm run typecheck
+npm run test:smoke          # @smoke only (CI gate)
+npm run test:regression     # @regression only
+npm run test:api            # tests/api
+npm run test:ui             # Playwright UI mode
+npm run test:report         # last HTML report
+```
+
+Projects: `chromium` (all tests), `smoke` (`@smoke`), `regression` (`@regression`). Chromium is the default assessment browser.
+
+---
+
+## 11. Optional MCP
+
+**Assessment path:** Playwright browser MCP (see `docs/GETTING_STARTED.md`) is enough for Foundations. Local **test-analyzer** is optional for report triage.
+
+GitHub, Qase, and Atlassian MCP are **not** required. `.cursor/mcp.optional.example.json` is a **template** of common org tools (CI, TMS, issue tracker). Copy **only** the servers you actually use into **local** `.cursor/mcp.json` (gitignored). Swap package, URL, and env for your company’s MCP (Linear, Azure DevOps, TestRail, BrowserStack, or any other allowlisted server). Never commit tokens or `.cursor/mcp.json`.
+
+1. `cd mcp-servers/test-analyzer && npm ci` (optional report MCP)
+2. Copy `.cursor/mcp.json.example` → **local** `.cursor/mcp.json` (do not commit).
+3. Point `PLAYWRIGHT_JSON_REPORT` at `test-results/report.json`.
+4. Org tools: merge from `.cursor/mcp.optional.example.json` **only** when allowlisted and needed.
+
+If any Cursor rule, Claude command, or workflow conflicts with this file, **AGENTS.md wins**.

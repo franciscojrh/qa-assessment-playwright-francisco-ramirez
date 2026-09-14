@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": ".cursor/hooks/guard-shell.py",
+        "failClosed": false
+      }
+    ],
+    "afterShellExecution": [
+      {
+        "command": ".cursor/hooks/audit-shell.py"
+      }
+    ],
+    "beforeMCPExecution": [
+      {
+        "command": ".cursor/hooks/guard-mcp.py",
+        "failClosed": false
+      }
+    ],
+    "afterFileEdit": [
+      {
+        "command": ".cursor/hooks/after-e2e-edit.py",
+        "matcher": "Write|Edit"
+      }
+    ],
+    "stop": [
+      {
+        "command": ".cursor/hooks/log-session.py"
+      }
+    ]
+  }
+}
