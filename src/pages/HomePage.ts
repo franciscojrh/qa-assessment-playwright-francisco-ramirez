@@ -30,7 +30,7 @@ export class HomePage extends BasePage {
     super(page);
 
     // Navigation locators using accessibility roles and labels
-    this.brandLogo = page.getByRole('link', { name: 'Playwright', exact: true });
+    this.brandLogo = page.getByRole('link', { name: /Playwright/i }).first();
     this.docsNavLink = page.getByRole('link', { name: 'Docs', exact: true }).first();
     this.apiNavLink = page.getByRole('link', { name: 'API', exact: true });
     this.mcpNavLink = page.getByRole('link', { name: 'MCP', exact: true });
