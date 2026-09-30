@@ -7,17 +7,11 @@ import {
   restoreSessionStorage,
 } from '../auth/sessionStorage';
 import { isCognitoMode } from '../data/constants';
-import { ExamplePage } from '../pages/ExamplePage';
+import { ExamplePage, HomePage, DocsPage } from '../pages';
 
 /**
  * Custom Fixtures Type Definition
  * Candidates should register their candidate-authored Page Object Models here.
- *
- * Example:
- * export type CustomFixtures = {
- *   loginPage: LoginPage;
- *   dashboardPage: DashboardPage;
- * };
  */
 export type CustomFixtures = {
   /** Generic HTTP client for API specs. */
@@ -28,7 +22,10 @@ export type CustomFixtures = {
   freshAuthPage: Page;
   /** Example POM for the default playwright.dev smoke target. */
   examplePage: ExamplePage;
-  // Add custom page object fixture types here
+  /** Primary landing page for playwright.dev */
+  homePage: HomePage;
+  /** Documentation views and navigation for playwright.dev */
+  docsPage: DocsPage;
 };
 
 /**
@@ -97,11 +94,13 @@ export const test = baseTest.extend<CustomFixtures>({
     await use(new ExamplePage(appPage));
   },
 
-  // Register additional fixture implementations here. Example:
-  // loginPage: async ({ page }, use) => {
-  //   const loginPage = new LoginPage(page);
-  //   await use(loginPage);
-  // },
+  homePage: async ({ appPage }, use) => {
+    await use(new HomePage(appPage));
+  },
+
+  docsPage: async ({ appPage }, use) => {
+    await use(new DocsPage(appPage));
+  },
 });
 
 export { expect };
