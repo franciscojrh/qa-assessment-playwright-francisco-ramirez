@@ -7,7 +7,7 @@ import {
   restoreSessionStorage,
 } from '../auth/sessionStorage';
 import { isCognitoMode } from '../data/constants';
-import { ExamplePage, HomePage, DocsPage } from '../pages';
+import { ExamplePage, HomePage, DocsPage, TodoPage } from '../pages';
 
 /**
  * Custom Fixtures Type Definition
@@ -26,6 +26,8 @@ export type CustomFixtures = {
   homePage: HomePage;
   /** Documentation views and navigation for playwright.dev */
   docsPage: DocsPage;
+  /** Dynamic stateful TodoMVC Page Object for Tier 2 */
+  todoPage: TodoPage;
 };
 
 /**
@@ -100,6 +102,10 @@ export const test = baseTest.extend<CustomFixtures>({
 
   docsPage: async ({ appPage }, use) => {
     await use(new DocsPage(appPage));
+  },
+
+  todoPage: async ({ appPage }, use) => {
+    await use(new TodoPage(appPage));
   },
 });
 
