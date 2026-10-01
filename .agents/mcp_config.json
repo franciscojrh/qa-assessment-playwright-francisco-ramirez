@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@executeautomation/playwright-mcp-server"
+      ]
+    },
+    "test-analyzer": {
+      "command": "node",
+      "args": [
+        "/Users/francisco.rh/Documents/assesment/qa-assessment-playwright-mcp/mcp-servers/test-analyzer/index.mjs"
+      ],
+      "env": {
+        "PLAYWRIGHT_JSON_REPORT": "/Users/francisco.rh/Documents/assesment/qa-assessment-playwright-mcp/test-results/report.json"
+      }
+    }
+  }
+}
