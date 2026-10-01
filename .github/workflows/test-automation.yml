@@ -2,19 +2,27 @@ name: Playwright Test Automation Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
+# Cancel any in-flight run for the same ref to avoid wasting minutes
 concurrency:
   group: e2e-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  NODE_VERSION: '20'
+  BASE_URL: ${{ vars.BASE_URL || 'https://playwright.dev' }}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Job 1 — Static Analysis (fast gate, runs before any browser job)
+# ─────────────────────────────────────────────────────────────────────────────
 jobs:
-  test:
-    name: Playwright Test Execution
-    timeout-minutes: 15
+  typecheck:
+    name: TypeCheck & Static Analysis
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -22,42 +30,221 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'npm'
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
 
       - name: Install Dependencies
         run: npm ci
 
-      - name: TypeCheck & Static Analysis
+      - name: TypeScript Compilation Check
         run: npm run typecheck
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Job 2 — Smoke Suite (sharded across 2 runners)
+# ─────────────────────────────────────────────────────────────────────────────
+  smoke:
+    name: Smoke Tests (Shard ${{ matrix.shard }}/${{ strategy.job-total }})
+    needs: typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
 
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Run Playwright Smoke Tests
-        run: npm run test:smoke
+      - name: Run Smoke Tests (Shard ${{ matrix.shard }}/${{ strategy.job-total }})
+        id: smoke_run
+        run: |
+          npx playwright test --project=smoke \
+            --shard=${{ matrix.shard }}/${{ strategy.job-total }} \
+            --reporter=list,json,html
         env:
           CI: 'true'
-          BASE_URL: ${{ vars.BASE_URL || 'https://playwright.dev' }}
+          BASE_URL: ${{ env.BASE_URL }}
+          PLAYWRIGHT_JSON_REPORT: test-results/report-smoke-${{ matrix.shard }}.json
 
-      - name: Upload Test Report Artifacts
+      - name: Upload Smoke Report Artifact
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report
+          name: smoke-report-shard-${{ matrix.shard }}
           path: |
             playwright-report/
-            test-results/report.json
+            test-results/report-smoke-${{ matrix.shard }}.json
           retention-days: 14
           if-no-files-found: warn
 
-      - name: Upload failure traces
-        if: failure()
+      - name: Upload Smoke Failure Traces
         uses: actions/upload-artifact@v4
+        if: failure()
         with:
-          name: playwright-failure-traces-screenshots
+          name: smoke-traces-shard-${{ matrix.shard }}
           path: |
             test-results/**/*.zip
             test-results/**/*.png
+            test-results/**/*.webm
           retention-days: 14
           if-no-files-found: ignore
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Job 3 — Regression Suite (sharded across 4 runners)
+# ─────────────────────────────────────────────────────────────────────────────
+  regression:
+    name: Regression Tests (Shard ${{ matrix.shard }}/${{ strategy.job-total }})
+    needs: typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Regression Tests (Shard ${{ matrix.shard }}/${{ strategy.job-total }})
+        id: regression_run
+        run: |
+          npx playwright test --project=regression \
+            --shard=${{ matrix.shard }}/${{ strategy.job-total }} \
+            --reporter=list,json,html
+        env:
+          CI: 'true'
+          BASE_URL: ${{ env.BASE_URL }}
+          PLAYWRIGHT_JSON_REPORT: test-results/report-regression-${{ matrix.shard }}.json
+
+      - name: Upload Regression Report Artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: regression-report-shard-${{ matrix.shard }}
+          path: |
+            playwright-report/
+            test-results/report-regression-${{ matrix.shard }}.json
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Upload Regression Failure Traces
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: regression-traces-shard-${{ matrix.shard }}
+          path: |
+            test-results/**/*.zip
+            test-results/**/*.png
+            test-results/**/*.webm
+          retention-days: 14
+          if-no-files-found: ignore
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Job 4 — AI Failure Triage (runs only when smoke or regression fails)
+# ─────────────────────────────────────────────────────────────────────────────
+  ai-triage:
+    name: AI Failure Triage
+    needs: [smoke, regression]
+    if: failure()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Download All Test Report Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: '*-report-shard-*'
+          path: downloaded-reports/
+          merge-multiple: true
+
+      - name: Merge JSON Reports for Triage
+        run: |
+          # Combine all shard report JSON files into a single merged report
+          node -e "
+            const fs = require('fs');
+            const path = require('path');
+            const glob = require('fs').readdirSync('test-results', { recursive: true });
+            const reports = [];
+            function findReports(dir) {
+              try {
+                const entries = fs.readdirSync(dir, { withFileTypes: true });
+                for (const e of entries) {
+                  const full = path.join(dir, e.name);
+                  if (e.isDirectory()) findReports(full);
+                  else if (e.name.endsWith('.json') && e.name.startsWith('report-')) {
+                    try { reports.push(JSON.parse(fs.readFileSync(full, 'utf8'))); } catch {}
+                  }
+                }
+              } catch {}
+            }
+            findReports('downloaded-reports');
+            if (reports.length === 0) {
+              fs.writeFileSync('test-results/report.json', JSON.stringify({ suites: [] }));
+            } else if (reports.length === 1) {
+              fs.mkdirSync('test-results', { recursive: true });
+              fs.writeFileSync('test-results/report.json', JSON.stringify(reports[0]));
+            } else {
+              const merged = reports[0];
+              for (let i = 1; i < reports.length; i++) {
+                for (const suite of (reports[i].suites || [])) {
+                  merged.suites = merged.suites || [];
+                  merged.suites.push(suite);
+                }
+              }
+              fs.mkdirSync('test-results', { recursive: true });
+              fs.writeFileSync('test-results/report.json', JSON.stringify(merged));
+            }
+            console.log('Merged', reports.length, 'report(s)');
+          "
+
+      - name: Run AI Failure Triage
+        run: |
+          npx ts-node --project tsconfig.json scripts/ai-triage.ts test-results/report.json
+        env:
+          GITHUB_STEP_SUMMARY: ${{ runner.temp }}/triage-summary.md
+
+      - name: Append Triage to GitHub Step Summary
+        if: always()
+        run: |
+          if [ -f "${{ runner.temp }}/triage-summary.md" ]; then
+            cat "${{ runner.temp }}/triage-summary.md" >> $GITHUB_STEP_SUMMARY
+          fi
+
